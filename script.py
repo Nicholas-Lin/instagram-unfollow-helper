@@ -1,3 +1,4 @@
+from operator import not_
 from instagram_private_api import Client, ClientCompatPatch
 from credentials import USERNAME, PASSWORD
 from datetime import datetime
@@ -66,18 +67,21 @@ def populate_list_recent_post(dict):
     data = []
     i = 0
     for pk, username in dict.items():
-        i += 1
-        recent_post_date = get_recent_post_date(pk)
-        data.append([pk, username, str(recent_post_date)])
-        print((i/len(dict))*100)
+        if(i < 10):
+            i += 1
+            recent_post_date = get_recent_post_date(pk)
+            data.append([pk, username, recent_post_date.strftime("%m/%d/%Y")])
+            print((i/len(dict))*100)
     return data
 
 
 def write_to_file(data):
     with open(user_name + '.csv', 'w', encoding='UTF8') as f:
         writer = csv.writer(f)
-        writer.writerow(["id", "name", "date"])
+        writer.writerow(["name", "date"])
         for row in data:
+            # Remove ID from print
+            row.pop()
             row[1] = '=HYPERLINK("https://www.instagram.com/' + \
                 row[1] + '/"' + ', "' + row[1] + '")'
         writer.writerows(data)
